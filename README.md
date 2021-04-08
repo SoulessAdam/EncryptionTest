@@ -1,3 +1,3 @@
 # EncryptionTest 
-* shitty ode from a shitty dev
+* shitty code from a shitty dev
   * Enjoy!
