@@ -14,7 +14,7 @@ namespace EncryptionTest
             {
                 aes.KeySize = 256;
                 aes.Key = Encoding.UTF8.GetBytes(
-                    "FakeKeyForSendingToTheServerFun!"); /* RANDOMISE ON ACCOUNT CREATION, STORE IN DB, HAVE SENT ON LOGIN. LOAD INTO MEM TO ENCODE THEN WIPE!*/
+                    "FakeKeyForSendingToTheServerFun!"); /* Randomise on each login? Idk if we should use static keys, I see no reason not too but tbh idrc */
                 /* ^ Segment this serverside? Prevent MITM key stealing ig, more secure, client knows key, server knows key but only part of key is used, could even
                  BASE64 encode this incase too. -- Edit I have implemented this below, we can use this to secure our keys and make cracking this shit a pain
                  They'd have to first B64 decode the key, then try replicate out segments from our key. The actual key is never seen in plain text yet its easy for
