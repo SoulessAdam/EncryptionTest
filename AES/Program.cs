@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using System.Linq;
 
 namespace EncryptionTest
 {
@@ -9,30 +10,40 @@ namespace EncryptionTest
     {
         public static void Main()
         {
-            string a =
-                "your shit script";
+            string a = "MinifiedScriptGoesHereIG";
             using (Aes aes = new AesManaged())
             {
+                aes.KeySize = 256;
+                Console.WriteLine(aes.KeySize);
+                aes.Key = System.Text.Encoding.UTF8.GetBytes("FakeKeyForSendingToTheServerFun!"); 
+                /* ^ Segment this serverside? Prevent MITM key stealing ig, more secure, client knows key, server knows key but only part of key is used, could even
+                 BASE64 encode this incase too.*/
+                Console.WriteLine(aes.Key.Length);
                 // Implement this function to send off our key to a server and return our encrypted script
-                byte[] encrypted = EncryptStringToBytes_Aes(a, aes.Key, aes.IV);
-
+                string base64Key = System.Convert.ToBase64String(aes.Key);
+                byte[] encrypted = EncryptStringToBytes_Aes(a, base64Key, aes.IV);
                 // Decrypt the bytes returned from the function above to get out minified script
-                string roundtrip = DecryptStringFromBytes_Aes(encrypted, aes.Key, aes.IV);
+                string roundtrip = DecryptStringFromBytes_Aes(encrypted, base64Key, aes.IV);
 
                 //Display the original data and the decrypted data.
                 Console.WriteLine($"Original:   {a}");
-                Console.WriteLine($"Decrypted: {roundtrip}");
+                Console.WriteLine($"Original: {roundtrip}");
             }
         }
 
-        static byte[] EncryptStringToBytes_Aes(string original, Byte[] Key, Byte[] IV)
+        static byte[] EncryptStringToBytes_Aes(string original, string Base64Key, byte[] IV)
         {
             // Create out byte array for encrypted bytes. This is serverside...
             byte[] encryptedScript;
 
+            var Key = Convert.FromBase64String(Base64Key);
+
             using (AesManaged aesAlg = new AesManaged())
             {
-                aesAlg.Key = Key;
+                aesAlg.KeySize = 128;
+                Byte[] actualKey = {Key[1], Key[3], Key[5], Key[16], Key[4], Key[2], Key[5], Key[1], Key[8], Key[31], Key[21], Key[16], Key[13], Key[15], Key[13], Key[0]};
+                
+                aesAlg.Key = actualKey;
                 aesAlg.IV = IV;
 
                 // Create an encryptor to perform the stream transform.
@@ -57,14 +68,16 @@ namespace EncryptionTest
             return encryptedScript;
         }
 
-        static string DecryptStringFromBytes_Aes(byte[] encrypted, byte[] Key, byte[] IV)
+        static string DecryptStringFromBytes_Aes(byte[] encrypted, string Base64Key, byte[] IV)
         {
             // create a string for our minified script.
             string script = "";
 
             using (AesManaged aesAlg = new AesManaged())
             {
-                aesAlg.Key = Key;
+                byte[] Key = Convert.FromBase64String(Base64Key);
+                Byte[] actualKey = {Key[1], Key[3], Key[5], Key[16], Key[4], Key[2], Key[5], Key[1], Key[8], Key[31], Key[21], Key[16], Key[13], Key[15], Key[13], Key[0]};
+                aesAlg.Key = actualKey;
                 aesAlg.IV = IV;
 
                 // Create a decryptor to perform the stream transform.
