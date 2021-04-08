@@ -13,7 +13,6 @@ namespace EncryptionTest
             using (Aes aes = new AesManaged())
             {
                 aes.KeySize = 256;
-                Console.WriteLine(aes.KeySize);
                 aes.Key = Encoding.UTF8.GetBytes(
                     "FakeKeyForSendingToTheServerFun!"); /* RANDOMISE ON ACCOUNT CREATION, STORE IN DB, HAVE SENT ON LOGIN. LOAD INTO MEM TO ENCODE THEN WIPE!*/
                 /* ^ Segment this serverside? Prevent MITM key stealing ig, more secure, client knows key, server knows key but only part of key is used, could even
@@ -21,7 +20,6 @@ namespace EncryptionTest
                  They'd have to first B64 decode the key, then try replicate out segments from our key. The actual key is never seen in plain text yet its easy for
                  us to use it. IDK why I even went about it this way but its the simplest way I could come up with to share keys and not have it comped. Without a load of security shit
                  that I don't understand, we need to obfuscate and pack all of this shit too.  */
-                Console.WriteLine(aes.Key.Length);
                 // Implement this function to send off our key to a server and return our encrypted script
                 var base64Key = Convert.ToBase64String(aes.Key);
                 var encrypted = EncryptStringToBytes_Aes(a, base64Key, aes.IV);
