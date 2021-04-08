@@ -10,39 +10,39 @@ namespace EncryptionTest
     {
         public static void Main()
         {
-            string a = "MinifiedScriptGoesHereIG";
+            string a = "MinifiedScriptGoesHereCouldEvenUseJSFUCK?";
             using (Aes aes = new AesManaged())
             {
                 aes.KeySize = 256;
                 Console.WriteLine(aes.KeySize);
-                aes.Key = System.Text.Encoding.UTF8.GetBytes("FakeKeyForSendingToTheServerFun!"); 
+                aes.Key = System.Text.Encoding.UTF8.GetBytes("FakeKeyForSendingToTheServerFun!"); /* RANDOMISE ON ACCOUNT CREATION, STORE IN DB, HAVE SENT ON LOGIN. LOAD INTO MEM TO ENCODE THEN WIPE!*/
                 /* ^ Segment this serverside? Prevent MITM key stealing ig, more secure, client knows key, server knows key but only part of key is used, could even
-                 BASE64 encode this incase too.*/
+                 BASE64 encode this incase too. -- Edit I have implemented this below, we can use this to secure our keys and make cracking this shit a pain
+                 They'd have to first B64 decode the key, then try replicate out segments from our key. The actual key is never seen in plain text yet its easy for
+                 us to use it. IDK why I even went about it this way but its the simplest way I could come up with to share keys and not have it comped. Without a load of security shit
+                 that I don't understand, we need to obfuscate and pack all of this shit too.  */
                 Console.WriteLine(aes.Key.Length);
                 // Implement this function to send off our key to a server and return our encrypted script
-                string base64Key = System.Convert.ToBase64String(aes.Key);
+                string base64Key = Convert.ToBase64String(aes.Key);
                 byte[] encrypted = EncryptStringToBytes_Aes(a, base64Key, aes.IV);
                 // Decrypt the bytes returned from the function above to get out minified script
-                string roundtrip = DecryptStringFromBytes_Aes(encrypted, base64Key, aes.IV);
+                string decryted = DecryptStringFromBytes_Aes(encrypted, base64Key, aes.IV);
 
                 //Display the original data and the decrypted data.
-                Console.WriteLine($"Original:   {a}");
-                Console.WriteLine($"Original: {roundtrip}");
+                Console.WriteLine($"Original:  {a}");
+                Console.WriteLine($"Decrypted: {decryted}");
             }
         }
 
         static byte[] EncryptStringToBytes_Aes(string original, string Base64Key, byte[] IV)
         {
-            // Create out byte array for encrypted bytes. This is serverside...
+            // This  would be serverside...
             byte[] encryptedScript;
-
-            var Key = Convert.FromBase64String(Base64Key);
-
             using (AesManaged aesAlg = new AesManaged())
             {
-                aesAlg.KeySize = 128;
+                var Key = Convert.FromBase64String(Base64Key);
                 Byte[] actualKey = {Key[1], Key[3], Key[5], Key[16], Key[4], Key[2], Key[5], Key[1], Key[8], Key[31], Key[21], Key[16], Key[13], Key[15], Key[13], Key[0]};
-                
+                aesAlg.KeySize = 128;
                 aesAlg.Key = actualKey;
                 aesAlg.IV = IV;
 
