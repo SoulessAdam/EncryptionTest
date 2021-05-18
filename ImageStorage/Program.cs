@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,8 +18,8 @@ namespace ImageStorage
         {
             await Startup.checkDir();
             await Task.Delay(1250);
-            FileCount = Directory.EnumerateFiles(Settings.savePath).ToArray().Length;
-            Key = args[2];
+            // FileCount = Directory.EnumerateFiles(Settings.savePath).ToArray().Length;
+            Key = args[1];
             EncryptImages();
             // CHECK MODES FOR DECRYPT WHEN DONE
         }
@@ -30,7 +29,7 @@ namespace ImageStorage
             var dir = new DirectoryInfo(Directory.GetCurrentDirectory());
             var files = dir.GetFiles("*.png");
             var images = new List<Image>();
-            foreach (var image in files) images.Add(Image.FromFile(image.DirectoryName));
+            foreach (var image in files) images.Add(Image.FromFile(image.FullName));
 
             return images.ToArray();
         }
