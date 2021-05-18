@@ -12,15 +12,16 @@ namespace EncryptionTest
             var a = "MinifiedScriptGoesHereCouldEvenUseJSFUCK?";
             using (Aes aes = new AesManaged())
             {
-                var Key = Encoding.UTF8.GetBytes(
-                    "FakeKeyForSendingToTheServerFun!"); /* RANDOMISE ON EACH LOGIN. LOAD INTO MEM TO ENCODE THEN WIPE!*/
+                aes.KeySize = 256;
+                aes.Key = Encoding.UTF8.GetBytes(
+                    "FakeKeyForSendingToTheServerFun!"); /* Randomise on each login? Idk if we should use static keys, I see no reason not too but tbh idrc */
                 /* ^ Segment this serverside? Prevent MITM key stealing ig, more secure, client knows key, server knows key but only part of key is used, could even
                  BASE64 encode this incase too. -- Edit I have implemented this below, we can use this to secure our keys and make cracking this shit a pain
                  They'd have to first B64 decode the key, then try replicate out segments from our key. The actual key is never seen in plain text yet its easy for
                  us to use it. IDK why I even went about it this way but its the simplest way I could come up with to share keys and not have it comped. Without a load of security shit
                  that I don't understand, we need to obfuscate and pack all of this shit too.  */
                 // Implement this function to send off our key to a server and return our encrypted script
-                var base64Key = Convert.ToBase64String(Key);
+                var base64Key = Convert.ToBase64String(aes.Key);
                 var encrypted = EncryptStringToBytes_Aes(a, base64Key, aes.IV);
                 // Decrypt the bytes returned from the function above to get out minified script
                 var decryted = DecryptStringFromBytes_Aes(encrypted, base64Key, aes.IV);
