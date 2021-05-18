@@ -13,11 +13,13 @@ namespace ImageStorage
         private static string Key = "TheDefaultKeyPleaseOverwriteThis";
 
         // private static string Mode;
-        private static int FileCount = Directory.EnumerateFiles(Settings.savePath).ToArray().Length;
+        private static int FileCount;
 
         private static async Task Main(string[] args)
         {
             await Startup.checkDir();
+            await Task.Delay(1250);
+            FileCount = Directory.EnumerateFiles(Settings.savePath).ToArray().Length;
             Key = args[2];
             EncryptImages();
             // CHECK MODES FOR DECRYPT WHEN DONE
