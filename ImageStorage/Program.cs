@@ -72,7 +72,8 @@ namespace ImageStorage
                             swEncrypt.Write(bytes);
                         }
 
-                        await SaveImage(msEncrypt.ToArray(), $"{FileCount++}.ae");
+                        await SaveImage(msEncrypt.ToArray(), $"{FileCount}.ae");
+                        FileCount += 1;
                     }
                 }
             }
